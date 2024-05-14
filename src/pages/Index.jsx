@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Box, Button, Container, Input, Textarea, VStack, Text } from "@chakra-ui/react";
+import { Box, Button, Container, Textarea, VStack, Text } from "@chakra-ui/react";
 import { FaRobot } from "react-icons/fa";
+import { create } from "../../lib/openai";
 
 const Index = () => {
   const [prompt, setPrompt] = useState("");
@@ -13,9 +14,16 @@ const Index = () => {
   const handleSubmit = async () => {
     if (!prompt) return;
 
-    // Simulating an API call to GPT-3.5 Turbo
-    const simulatedApiResponse = `This is a simulated response for the prompt: "${prompt}"`;
-    setResponse(simulatedApiResponse);
+    const response = await create({
+      messages: [{ role: "user", content: prompt }],
+      model: "gpt-3.5-turbo",
+    });
+
+    if (response.data && response.data.choices && response.data.choices.length > 0) {
+      setResponse(response.data.choices[0].message.content);
+    } else {
+      setResponse("Failed to fetch response.");
+    }
   };
 
   return (
